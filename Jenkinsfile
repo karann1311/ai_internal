@@ -3,20 +3,20 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/<your-username>/Iris-ML-Project.git'
+                git branch: 'main', url: 'https://github.com/karann1311/ai_internal.git'
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t iris-ml-app .'
+                    sh 'docker build -t iris-flask-app .'
                 }
             }
         }
-        stage('Run Docker Container') {
+        stage('Run Container') {
             steps {
                 script {
-                    sh 'docker run iris-ml-app'
+                    sh 'docker run -d -p 5000:5000 iris-flask-app'
                 }
             }
         }

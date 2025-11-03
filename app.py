@@ -1,28 +1,22 @@
-# app.py
-import pandas as pd
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
+from flask import Flask, request, jsonify
 import pickle
+import numpy as np
 
-# Load dataset
-iris = load_iris()
-X = iris.data
-y = iris.target
+app = Flask(__name__)
 
-# Split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Load trained model
+model = pickle.load(open("iris_model.pkl", "rb"))
 
-# Train model
-model = LogisticRegression(max_iter=200)
-model.fit(X_train, y_train)
+@app.route('/')
+def home():
+    return "Iris ML Flask API is running!"
 
-# Evaluate
-accuracy = model.score(X_test, y_test)
-print(f"Model Accuracy: {accuracy*100:.2f}%")
+@app.route('/predict', methods=['POST'])
+def predict():
+    data = request.get_json()
+    features = np.array(data["features"]).reshape(1, -1)
+    prediction = int(model.predict(features)[0])
+    return jsonify({'prediction': prediction})
 
-# Save model
-with open("iris_model.pkl", "wb") as f:
-    pickle.dump(model, f)
-
-print("Model saved successfully as iris_model.pkl")
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
